@@ -57,6 +57,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="CircularCloudLayouter.cs" />
+    <Compile Include="Tests\Infrastructure\CircularCloudLayouterTestContext.cs" />
     <Compile Include="Tests\Infrastructure\ImageOutput.cs" />
     <Compile Include="Draw\CircularCloudDrawer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -1,9 +1,8 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Drawing;
+using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
-using TagsCloudVisualization.Draw;
 using TagsCloudVisualization.Tests.Infrastructure;
 
 namespace TagsCloudVisualization.Tests
@@ -15,11 +14,11 @@ namespace TagsCloudVisualization.Tests
         public void PlaceCenter_WhenSingle()
         {
             var center = new Point(20, 30);
-            var layouter = new CircularCloudLayouter(center);
-
-            var rect = layouter.PutNextRectangle(new Size(10, 12));
-
-            Draw(new[] {rect}, center);
+            var testContext = new CircularCloudLayouterTestContext(center);
+            
+            var rect = testContext.PutNextRectangle(new Size(10, 12));
+            testContext.DisplayResults();
+            
 
             new {rect.X, rect.Y, rect.Width, rect.Height}
                 .ShouldBeEquivalentTo(
@@ -31,19 +30,149 @@ namespace TagsCloudVisualization.Tests
         public void PlaceSomeTopOrBottomCorner_WhenDoubleWide()
         {
             var center = new Point(20, 30);
-            var layouter = new CircularCloudLayouter(center);
+            var testContext = new CircularCloudLayouterTestContext(center);
 
-            layouter.PutNextRectangle(new Size(10, 8));
-            var rect2 = layouter.PutNextRectangle(new Size(4, 3));
+            testContext.PutNextRectangle(new Size(10, 8));
+            var rect2 = testContext.PutNextRectangle(new Size(4, 3));
+            testContext.DisplayResults();
 
             (rect2.X - center.X).Should().BeOneOf(-5, 1);
             (rect2.Y - center.Y).Should().BeOneOf(-7, 4);
-
         }
 
-        private static void Draw(IEnumerable<Rectangle> result, Point center)
+        [Test]
+        public void PlaceSomeRightOrLeftCorner_WhenDoubleTall()
         {
-            Console.WriteLine("result: " + new CircularCloudDrawer().DrawRectangles(result, center).OutputForTest());
+            var center = new Point(30, 20);
+            var testContext = new CircularCloudLayouterTestContext(center);
+
+            testContext.PutNextRectangle(new Size(8, 10));
+            var rect2 = testContext.PutNextRectangle(new Size(3, 4));
+            testContext.DisplayResults();
+
+            (rect2.X - center.X).Should().BeOneOf(-7, 4);
+            (rect2.Y - center.Y).Should().BeOneOf(-5, 1);
+        }
+
+        [Test]
+        public void NotIntersected_WhenManySame()
+        {
+            var center = new Point(300, 200);
+            var testContext = new CircularCloudLayouterTestContext(center);
+
+            for (int i = 0; i < 50; i++)
+            {
+                testContext.PutNextRectangle(new Size(8, 10));
+            }
+            testContext.DisplayResults();
+
+            AssertIntersection(testContext);
+        }
+
+        private static void AssertIntersection(CircularCloudLayouterTestContext testContext)
+        {
+            var generated = testContext.Generated;
+            for (int i = 0; i < generated.Count - 1; i++)
+            {
+                for (int j = i + 1; j < generated.Count; j++)
+                {
+                    if (generated[i].IntersectsWith(generated[j]))
+                    {
+                        Assert.Fail("index1:{0} rect1:{1}" +
+                                    "\n index2:{2} rect2:{3} intersected", i, generated[i], j,
+                            generated[j]);
+                    }
+                }
+            }
+        }
+
+        [Test]
+        public void NotIntersected_WhenManyInSmallOrder()
+        {
+            var center = new Point(300, 200);
+            var testContext = new CircularCloudLayouterTestContext(center);
+
+            for (int i = 0; i < 10; i++)
+            {
+                testContext.PutNextRectangle(new Size(80-i*5, 100 -i*5));
+            }
+            testContext.DisplayResults();
+
+            AssertIntersection(testContext);
+        }
+
+        [Test]
+        public void NotIntersected_WhenManyInGreaterOrder()
+        {
+            var center = new Point(700, 900);
+            var testContext = new CircularCloudLayouterTestContext(center);
+
+            for (int i = 0; i < 10; i++)
+            {
+                testContext.PutNextRectangle(new Size(80 + i * 5, 100 + i * 5));
+            }
+            testContext.DisplayResults();
+
+            AssertIntersection(testContext);
+        }
+
+        [Test]
+        public void NotIntersected_WhenPseudoRandom()
+        {
+            var rand = new Random(10);
+            var center = new Point(1024, 1024);
+            var testContext = new CircularCloudLayouterTestContext(center);
+
+            for (int i = 0; i < 50; i++)
+            {
+                testContext.PutNextRectangle(new Size(rand.Next(2,50), rand.Next(2, 50)));
+            }
+            for (int i = 0; i < 50; i++)
+            {
+                testContext.PutNextRectangle(new Size(rand.Next(2, 20), rand.Next(2, 20)));
+            }
+            testContext.DisplayResults();
+
+            AssertIntersection(testContext);
+        }
+
+        [TestCase(5,200,0.7)]
+        [TestCase(20,200, 0.6)]
+        public void GoodQuality_WhenPseudoRandom(int maxSize, int interations, double minLevel)
+        {
+            var rand = new Random(10);
+            var center = new Point(1024, 1024);
+            var testContext = new CircularCloudLayouterTestContext(center);
+
+            for (int i = 0; i < interations; i++)
+            {
+                testContext.PutNextRectangle(new Size(rand.Next(2, maxSize), rand.Next(2, maxSize)));
+            }
+            testContext.DisplayResults();
+
+            testContext.GetQuality().Should().BeGreaterThan(minLevel);
+        }
+
+        [Test, Timeout(1000)]
+        public void NotTimeout_WhenPseudoRandom()
+        {
+            var rand = new Random(10);
+            var center = new Point(1024, 1024);
+            var testContext = new CircularCloudLayouterTestContext(center);
+
+            for (int i = 0; i < 3; i++)
+            {
+                for (int j = 0; j < 50; j++)
+                {
+                    testContext.PutNextRectangle(new Size(rand.Next(2, 50), rand.Next(2, 50)));
+                }
+                for (int j = 0; j < 50; j++)
+                {
+                    testContext.PutNextRectangle(new Size(rand.Next(2, 20), rand.Next(2, 20)));
+                }
+            }
+            
+            testContext.DisplayResults();
         }
     }
 }
