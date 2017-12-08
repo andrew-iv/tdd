@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Drawing;
-using System.Linq;
 using FluentAssertions;
 using NUnit.Framework;
 using TagsCloudVisualization.Tests.Infrastructure;
@@ -69,23 +68,6 @@ namespace TagsCloudVisualization.Tests
             AssertIntersection(testContext);
         }
 
-        private static void AssertIntersection(CircularCloudLayouterTestContext testContext)
-        {
-            var generated = testContext.Generated;
-            for (int i = 0; i < generated.Count - 1; i++)
-            {
-                for (int j = i + 1; j < generated.Count; j++)
-                {
-                    if (generated[i].IntersectsWith(generated[j]))
-                    {
-                        Assert.Fail("index1:{0} rect1:{1}" +
-                                    "\n index2:{2} rect2:{3} intersected", i, generated[i], j,
-                            generated[j]);
-                    }
-                }
-            }
-        }
-
         [Test]
         public void NotIntersected_WhenManyInSmallOrder()
         {
@@ -136,17 +118,44 @@ namespace TagsCloudVisualization.Tests
             AssertIntersection(testContext);
         }
 
-        [TestCase(5,200,0.7)]
-        [TestCase(20,200, 0.6)]
-        public void GoodQuality_WhenPseudoRandom(int maxSize, int interations, double minLevel)
+        [TestCase(11, 5,200,0.70)]
+        [TestCase(111, 5, 200, 0.70)]
+        [TestCase(1111, 5, 200, 0.70)]
+        [TestCase(211, 5, 200, 0.70)]
+        [TestCase(11, 20, 200, 0.6)]
+        [TestCase(11, 100, 100, 0.55)]
+        [TestCase(11, 100, 20, 0.5)]
+        public void GoodQuality_WhenPseudoRandom(int seed, int maxSize, int interations, double minLevel)
         {
-            var rand = new Random(10);
+            var rand = new Random(seed);
             var center = new Point(1024, 1024);
             var testContext = new CircularCloudLayouterTestContext(center);
 
             for (int i = 0; i < interations; i++)
             {
                 testContext.PutNextRectangle(new Size(rand.Next(2, maxSize), rand.Next(2, maxSize)));
+            }
+            testContext.DisplayResults();
+
+            testContext.GetQuality().Should().BeGreaterThan(minLevel);
+        }
+
+        [TestCase(11, 5, 200, 0.65)]
+        [TestCase(111, 5, 200, 0.65)]
+        [TestCase(1111, 5, 200, 0.65)]
+        [TestCase(211, 5, 200, 0.65)]
+        [TestCase(11, 20, 200, 0.55)]
+        [TestCase(11, 100, 100, 0.50)]
+        [TestCase(11, 100, 20, 0.45)]
+        public void GoodQuality_WhenPseudoRandomWide(int seed, int maxSize, int interations, double minLevel)
+        {
+            var rand = new Random(seed);
+            var center = new Point(1024, 1024);
+            var testContext = new CircularCloudLayouterTestContext(center);
+
+            for (int i = 0; i < interations; i++)
+            {
+                testContext.PutNextRectangle(new Size(rand.Next(2, maxSize)*2, rand.Next(2, maxSize)));
             }
             testContext.DisplayResults();
 
@@ -173,6 +182,23 @@ namespace TagsCloudVisualization.Tests
             }
             
             testContext.DisplayResults();
+        }
+
+        private static void AssertIntersection(CircularCloudLayouterTestContext testContext)
+        {
+            var generated = testContext.Generated;
+            for (int i = 0; i < generated.Count - 1; i++)
+            {
+                for (int j = i + 1; j < generated.Count; j++)
+                {
+                    if (generated[i].IntersectsWith(generated[j]))
+                    {
+                        Assert.Fail("index1:{0} rect1:{1}" +
+                                    "\n index2:{2} rect2:{3} intersected", i, generated[i], j,
+                            generated[j]);
+                    }
+                }
+            }
         }
     }
 }

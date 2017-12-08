@@ -1,6 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Drawing;
-using System.Linq;
+﻿using System.Drawing;
 using FluentAssertions;
 using NUnit.Framework;
 using TagsCloudVisualization.Draw;
@@ -21,14 +19,9 @@ namespace TagsCloudVisualization.Tests
             new {bm.Height, bm.Width}.ShouldBeEquivalentTo(new {Height = 41, Width = 61});
         }
 
-        private static Bitmap DrawRectangles(Rectangle[] rectangles, Point center)
-        {
-            return new CircularCloudDrawer().DrawRectangles(rectangles, center);
-        }
-
         [Test]
         
-        public void WritesBitmapWithColorSize_When2Rects()
+        public void WritesBitmapWithDifferentColors_When2Rects()
         {
             var bitmap = DrawRectangles(new[]
             {
@@ -38,6 +31,11 @@ namespace TagsCloudVisualization.Tests
 
             new[] {bitmap.GetPixel(2, 3), bitmap.GetPixel(0, 0), bitmap.GetPixel(12, 13)}.Should()
                 .OnlyHaveUniqueItems();
+        }
+
+        private static Bitmap DrawRectangles(Rectangle[] rectangles, Point center)
+        {
+            return new CircularCloudDrawer().DrawRectangles(rectangles, center);
         }
     }
 }
