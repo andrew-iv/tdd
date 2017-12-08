@@ -64,9 +64,13 @@ namespace TagsCloudVisualization
             {
                 return AddToPlaced(CreateFirst(size));
             }
-            var bestCandidate = ExcludeIntersections(FindRawCandidates(size))
+            return AddToPlaced(FindBestCandidate(size));
+        }
+
+        private Rectangle FindBestCandidate(Size size)
+        {
+            return ExcludeIntersections(FindRawCandidates(size))
                 .MinBy(rect => Metrics.EuclidQuadToFarest(_center, rect));
-            return AddToPlaced(bestCandidate);
         }
 
         private IEnumerable<Rectangle> FindRawCandidates(Size size)
