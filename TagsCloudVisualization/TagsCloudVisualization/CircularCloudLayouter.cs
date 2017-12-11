@@ -33,7 +33,7 @@ namespace TagsCloudVisualization
 
         internal static class CandidateFinder
         {
-            /// <returns>Список прямоугольников, расположенных в смежных углах по часовой стрелки, начиная от левого верхнего</returns>
+            /// <returns>Список прямоугольников, расположенных в смежных углах по часовой стрелке, начиная от левого верхнего</returns>
             public static IEnumerable<Rectangle> PlaceInCorners(Rectangle source, Size toPlace)
             {
                 yield return new Rectangle(new Point(source.Left - toPlace.Width, source.Top), toPlace);
