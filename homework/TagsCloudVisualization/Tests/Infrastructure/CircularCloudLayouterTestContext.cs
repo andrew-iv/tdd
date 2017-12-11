@@ -8,11 +8,15 @@ namespace TagsCloudVisualization.Tests.Infrastructure
 {
     internal class CircularCloudLayouterTestContext
     {
-        private readonly CircularCloudLayouter _layouter;
+        private CircularCloudLayouter _layouter;
         public List<Rectangle> Generated { get; } = new List<Rectangle>();
-        public Point Center { get; }
+        public Point Center { get; private set; }
 
-        public CircularCloudLayouterTestContext(Point center)
+        public CircularCloudLayouterTestContext()
+        {
+        }
+
+        public void Init(Point center)
         {
             _layouter = new CircularCloudLayouter(center);
             Center = center;
@@ -27,17 +31,22 @@ namespace TagsCloudVisualization.Tests.Infrastructure
 
         public double GetQuality()
         {
+            
             var maxRadiusSquare = Generated.Max(rect => CircularCloudLayouter.Metrics.EuclidQuadToFarest(Center, rect));
             var circleSquare = maxRadiusSquare * Math.PI;
             var rectsSquare = Generated.Sum(x => x.Width * x.Height);
-            return rectsSquare / circleSquare;
+            return circleSquare == 0 ? 0 : rectsSquare / circleSquare;
         }
 
-        public void DisplayResults()
+        public void DumpResults()
         {
-            Console.WriteLine("result: " + new CircularCloudDrawer().DrawRectangles(Generated, Center).OutputForTest());
+            Console.WriteLine("Tag cloud visualization saved to file: " +
+                                  new CircularCloudDrawer().DrawRectangles(Generated, Center).OutputForTest());
+        }
+
+        public void DisplayQuality()
+        {
             Console.WriteLine("quality: " + GetQuality().ToString("F"));
         }
-        
     }
 }

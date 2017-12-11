@@ -1,4 +1,4 @@
-﻿using System.Drawing;
+﻿ using System.Drawing;
 using FluentAssertions;
 using NUnit.Framework;
 using TagsCloudVisualization.Draw;
