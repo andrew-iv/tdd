@@ -5,7 +5,7 @@ using MoreLinq;
 
 namespace TagsCloudVisualization
 {
-    public class CircularCloudLayouter
+    public class CircularCloudLayouter : ICircularCloudLayouter
     {
         internal static class Metrics
         {

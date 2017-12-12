@@ -12,10 +12,6 @@ namespace TagsCloudVisualization.Tests.Infrastructure
         public List<Rectangle> Generated { get; } = new List<Rectangle>();
         public Point Center { get; private set; }
 
-        public CircularCloudLayouterTestContext()
-        {
-        }
-
         public void Init(Point center)
         {
             _layouter = new CircularCloudLayouter(center);
