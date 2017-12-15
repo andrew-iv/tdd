@@ -2,7 +2,7 @@
 
 namespace TagsCloudContainer.Dto
 {
-    public class WordToDraw
+    public class Tag
     {
         public string Word { get; set; }
         public float FontSize { get; set; }

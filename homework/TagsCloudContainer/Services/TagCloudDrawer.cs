@@ -11,33 +11,29 @@ namespace TagsCloudContainer.Services
     {
         private readonly Func<Point, ICircularCloudLayouter> _layouterFactory;
         private readonly IWordRenderer _wordRenderer;
-        private readonly Func<WordRenderProperties> _propertiesFactory;
 
-        public TagCloudDrawer(Func<Point, ICircularCloudLayouter> layouterFactory, IWordRenderer wordRenderer,
-            Func<WordRenderProperties> propertiesFactory)
+        public TagCloudDrawer(Func<Point, ICircularCloudLayouter> layouterFactory, IWordRenderer wordRenderer)
         {
             _layouterFactory = layouterFactory;
             _wordRenderer = wordRenderer;
-            _propertiesFactory = propertiesFactory;
         }
 
-        public Image Draw(WordToDraw[] words)
+        public Image Draw(Tag[] words, WordRenderProperties properties)
         {
-            var properties = _propertiesFactory();
             var imageSize = properties.ImageSize;
             var bitmap = new Bitmap(imageSize.Width, imageSize.Height);
             var center = new Point(imageSize.Width / 2, imageSize.Height / 2);
             var layouter = _layouterFactory(center);
             var graphics = Graphics.FromImage(bitmap);
 
-            foreach (var word in words.OrderBy(x => x.FontColor))
+            foreach (var word in words.OrderByDescending(x => x.FontSize))
             {
                 RenderWord(graphics, word, properties, layouter);
             }
             return bitmap;
         }
 
-        private void RenderWord(Graphics graphics, WordToDraw word, WordRenderProperties properties,
+        private void RenderWord(Graphics graphics, Tag word, WordRenderProperties properties,
             ICircularCloudLayouter layouter)
         {
             var size = _wordRenderer.MesureText(graphics, word, properties);

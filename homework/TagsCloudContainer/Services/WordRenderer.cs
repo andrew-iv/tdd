@@ -7,26 +7,26 @@ namespace TagsCloudContainer.Services
 {
     public class WordRenderer : IWordRenderer
     {
-        public Size MesureText(Graphics graphics, WordToDraw wordToDraw, WordRenderProperties properties)
+        public Size MesureText(Graphics graphics, Tag tag, WordRenderProperties properties)
         {
             var sizeF = graphics.MeasureString(
-                wordToDraw.Word,
-                PrepareFont(wordToDraw, properties));
+                tag.Word,
+                PrepareFont(tag, properties));
 
 
             return CeilSizeF(sizeF);
         }
 
-        private static Font PrepareFont(WordToDraw wordToDraw, WordRenderProperties properties)
+        private static Font PrepareFont(Tag tag, WordRenderProperties properties)
         {
-            return new Font(properties.FontFamily, wordToDraw.FontSize);
+            return new Font(properties.FontFamily, tag.FontSize);
         }
 
-        public void RenderWord(Graphics graphics, Point point, WordToDraw wordToDraw,
+        public void RenderWord(Graphics graphics, Point point, Tag tag,
             WordRenderProperties properties)
         {
-            graphics.DrawString(wordToDraw.Word, PrepareFont(wordToDraw, properties),
-                new SolidBrush(wordToDraw.FontColor), point);
+            graphics.DrawString(tag.Word, PrepareFont(tag, properties),
+                new SolidBrush(tag.FontColor), point);
         }
 
         private static Size CeilSizeF(SizeF sizeF)

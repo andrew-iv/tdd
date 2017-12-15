@@ -5,7 +5,7 @@ namespace TagsCloudContainer.Interfaces
 {
     public interface IWordRenderer
     {
-        Size MesureText(Graphics graphics, WordToDraw wordToDraw, WordRenderProperties properties);
-        void RenderWord(Graphics graphics, Point point, WordToDraw wordToDraw, WordRenderProperties properties);
+        Size MesureText(Graphics graphics, Tag tag, WordRenderProperties properties);
+        void RenderWord(Graphics graphics, Point point, Tag tag, WordRenderProperties properties);
     }
 }

@@ -5,6 +5,6 @@ namespace TagsCloudContainer.Interfaces
 {
     public interface ITagCloudDrawer
     {
-        Image Draw(WordToDraw[] words);
+        Image Draw(Tag[] words, WordRenderProperties properties);
     }
 }

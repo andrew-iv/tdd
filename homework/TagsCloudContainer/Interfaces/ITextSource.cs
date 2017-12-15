@@ -4,6 +4,6 @@ namespace TagsCloudContainer.Interfaces
 {
     public interface ITextSource
     {
-        IEnumerable<string> ReadWords(string filteName);
+        IEnumerable<string> ReadWords(string fileName);
     }
 }
