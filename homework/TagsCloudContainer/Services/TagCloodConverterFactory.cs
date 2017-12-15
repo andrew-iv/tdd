@@ -5,9 +5,9 @@ namespace TagsCloudContainer.Services
 {
     public static class TagCloodConverterFactory
     {
-        public static ITagCloodConverter ConstructDefault()
+        public static ITagCloodConverter ConstructDefault(int topWords = 100)
         {
-            return new TagCloodConverter(100, TagFontSizeScales.Liniar, TagColorScales.Random);
+            return new TagCloodConverter(topWords, TagFontSizeScales.Liniar, TagColorScales.Random);
         }
     }
 }

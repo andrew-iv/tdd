@@ -11,7 +11,7 @@ namespace TagsCloudContainer
         private static readonly string[] BoringWords = new[]
             {"я", "ты", "что", "где", "в", "и", "на", "не", "он", "а", "е", "с", "меня", "мне"};
 
-        public static ContainerBuilder Register(ContainerBuilder builder)
+        public static ContainerBuilder Register(ContainerBuilder builder, int topWords)
         {
             builder.RegisterAssemblyTypes(typeof(IWordListTransformer).Assembly)
                 .AsImplementedInterfaces();
@@ -21,7 +21,7 @@ namespace TagsCloudContainer
                 new NormalizeWordListTransformer(),
                 new ExcludeBoringWordListTransformer(BoringWords))
             ).As<IWordListTransformer>();
-            builder.Register(c => TagCloodConverterFactory.ConstructDefault()).As<ITagCloodConverter>();
+            builder.Register(c => TagCloodConverterFactory.ConstructDefault(topWords)).As<ITagCloodConverter>();
             return builder;
         }
     }
